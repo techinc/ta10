@@ -102,7 +102,7 @@ constructBase,
 	//		outf << esc << ".(;";
 	//	}
 
-	// will be written by open_page() 	outf << "IN;SC;PU;PU;SP1;LT;VS" << (int) TA10Scale << "\n";
+	// will be written by open_page() 	outf << "IN;SC;PU;PU;SP1;LT;VS" << (int) TA10Scale << "\r\n";
 
 	// read pen colors from file.
 	if (options->pencolorsfromfile) {
@@ -147,7 +147,7 @@ drvTA10::~drvTA10()
 {
 	// driver specific deallocations
 	// and writing of trailer to output file
-        // should be done either here or in close_page      	outf << "PU;PA0,0;SP;EC;PG1;EC1;OE\n";
+        // should be done either here or in close_page      	outf << "PU;PA0,0;SP;EC;PG1;EC1;OE\r\n";
 	delete [] penColors;
 	penColors = NIL;
 	options = NIL;
@@ -177,7 +177,7 @@ unsigned int drvTA10::readPenColors(ostream & errstream, const char *filename, b
 		//	cout << "read char " << c << endl;
 			if (c == '#') {
 				// skip chars till EOL
-				infile.ignore(256,'\n');
+				infile.ignore(256,'\r\n');
 			}
 		} else {
 		//	cout << "read float " << penid << endl;
@@ -216,10 +216,10 @@ void drvTA10::print_coords()
 					rot(x, y, rotation);
 #if USESPRINTF
 					char str[256];
-					sprintf_s(TARGETWITHLEN(str,256), "U%i,%i\n", (int) x, (int) y);
+					sprintf_s(TARGETWITHLEN(str,256), "U%i,%i\r\n", (int) x, (int) y);
 					outf << str;
 #else
-					outf << "U" << (int) x << "," << (int) y << "\n";
+					outf << "U" << (int) x << "," << (int) y << "\r\n";
 #endif
 				}
 				break;
@@ -232,10 +232,10 @@ void drvTA10::print_coords()
 						rot(x, y, rotation);
 #if USESPRINTF
 						char str[256];
-						sprintf_s(TARGETWITHLEN(str,256), "D%i,%i\n", (int) x, (int) y);
+						sprintf_s(TARGETWITHLEN(str,256), "D%i,%i\r\n", (int) x, (int) y);
 						outf << str;
 #else
-						outf << "D" << (int) x << "," << (int) y << "\n";
+						outf << "D" << (int) x << "," << (int) y << "\r\n";
 #endif
 					}
 					if (isPolygon() && (n == elems)) {
@@ -246,10 +246,10 @@ void drvTA10::print_coords()
 						rot(x, y, rotation);
 #if USESPRINTF
 						char str[256];
-						sprintf_s(TARGETWITHLEN(str,256), "D%i,%i\n", (int) x, (int) y);
+						sprintf_s(TARGETWITHLEN(str,256), "D%i,%i\r\n", (int) x, (int) y);
 						outf << str;
 #else
-						outf << "D" << (int) x << "," << (int) y << "\n";
+						outf << "D" << (int) x << "," << (int) y << "\r\n";
 #endif
 					}
 				}
@@ -262,10 +262,10 @@ void drvTA10::print_coords()
 					rot(x, y, rotation);
 #if USESPRINTF
 					char str[256];
-					sprintf_s(TARGETWITHLEN(str,256), "D%i,%i\n", (int) x, (int) y);
+					sprintf_s(TARGETWITHLEN(str,256), "D%i,%i\r\n", (int) x, (int) y);
 					outf << str;
 #else
-					outf << "D" << (int) x << "," << (int) y << "\n";
+					outf << "D" << (int) x << "," << (int) y << "\r\n";
 #endif
 				}
 				break;
@@ -309,12 +309,12 @@ void drvTA10::open_page()
 // U0,0
 // :715 (set plotter speed)
 
-	outf << ":83\n:32\n:520,20\n:E3500\nP1\nU0,0\n:715\n";
+	outf << ":83\r\n:32\r\n:520,20\r\n:E3500\r\nP1\r\nU0,0\r\n:715\r\n";
 }
 
 void drvTA10::close_page()
 {
- 	outf << "U0,0\n";
+ 	outf << "U0,0\r\n";
 }
 
 void drvTA10::SelectPen(float R, float G, float B)
@@ -351,7 +351,7 @@ void drvTA10::SelectPen(float R, float G, float B)
 			prevColor = reducedColor; // to avoid the lookup in probable case that next item is drawn with same color
 			if (currentPen != bestIndex) {
 				currentPen=bestIndex;
-				outf << "PU; \n" << currentPen << ";\n";
+				outf << "PU; \r\n" << currentPen << ";\r\n";
 			}
 		}
 	} else if (options->maxPenColors > 0) {
@@ -390,7 +390,7 @@ void drvTA10::SelectPen(float R, float G, float B)
 			}
 			// Select new pen
 			prevColor = reducedColor;
-			outf << "PU; \nSP" << npen << ";\n";
+			outf << "PU; \r\nSP" << npen << ";\r\n";
 		}
 		//  End DA hpgl color addition
 	} else {
@@ -420,18 +420,18 @@ drvhpgl.cpp:318: warning: ISO C++ does not support the `%lg' printf format
 
 #if USESPRINTF
 	char str[256];
-	sprintf_s(TARGETWITHLEN(str,256), "DI%g,%g;\n", dix, diy);
+	sprintf_s(TARGETWITHLEN(str,256), "DI%g,%g;\r\n", dix, diy);
 	outf << str;
-	sprintf_s(TARGETWITHLEN(str,256), "SI%g,%g;\n", textinfo.currentFontSize / 1000 * TA10Scale, textinfo.currentFontSize / 1000 * TA10Scale);
+	sprintf_s(TARGETWITHLEN(str,256), "SI%g,%g;\r\n", textinfo.currentFontSize / 1000 * TA10Scale, textinfo.currentFontSize / 1000 * TA10Scale);
 	outf << str;
-	sprintf_s(TARGETWITHLEN(str,256), "U%i,%i\n", (int) x, (int) y);
+	sprintf_s(TARGETWITHLEN(str,256), "U%i,%i\r\n", (int) x, (int) y);
 	outf << str;
 #else
-	outf << "DI" << dix << "," << diy << "\n";
-	outf << "SI" << textinfo.currentFontSize / 1000 * TA10Scale << "," << textinfo.currentFontSize / 1000  * TA10Scale << "\n";
-	outf << "U" << (int) x << "," << (int) y << "\n";
+	outf << "DI" << dix << "," << diy << "\r\n";
+	outf << "SI" << textinfo.currentFontSize / 1000 * TA10Scale << "," << textinfo.currentFontSize / 1000  * TA10Scale << "\r\n";
+	outf << "U" << (int) x << "," << (int) y << "\r\n";
 #endif
-	outf << "LB" << textinfo.thetext.value() << "\003\n" << endl;
+	outf << "LB" << textinfo.thetext.value() << "\003\r\n" << endl;
 }
 
 void drvTA10::show_path()
@@ -453,13 +453,13 @@ void drvTA10::show_path()
 				rot(x, y, rotation);
 #if USESPRINTF
 				char str[256];
-				sprintf_s(TARGETWITHLEN(str,256), "U%i,%i\n", (int) x, (int) y);
+				sprintf_s(TARGETWITHLEN(str,256), "U%i,%i\r\n", (int) x, (int) y);
 				outf << str;
 #else
-				outf << "U" << (int) x << "," << (int) y << "\n";
+				outf << "U" << (int) x << "," << (int) y << "\r\n";
 #endif
 // we don't support this HPGL
-//  cmd outf << options->fillinstruction.value << ";PM0\n";
+//  cmd outf << options->fillinstruction.value << ";PM0\r\n";
 			}
 			break;
 		default:				// cannot happen
@@ -477,7 +477,7 @@ void drvTA10::show_path()
 		case drvbase::fill:
 
 // we don't support this HPGL
-//			outf << "PM2;FP;EP\n";	// EP also draws path
+//			outf << "PM2;FP;EP\r\n";	// EP also draws path
 			break;
 		default:				// cannot happen
 			outf << "unexpected ShowType " << (int) currentShowType();
@@ -507,4 +507,3 @@ static DriverDescriptionT < drvTA10 > D_TA10("ta10", "TA10 code", "","ta10", fal
 												 DriverDescription::noimage,	// no support for PNG file images
 												 DriverDescription::normalopen, false,	// backend support multiple pages
 												 false /*clipping */ );
-
