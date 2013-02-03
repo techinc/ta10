@@ -1,0 +1,94 @@
+#ifndef __drvTA10_h
+#define __drvTA10_h
+
+/* 
+   drvta10.h : This file is part of pstoedit
+   Class declaration for ta10 output driver with no additional attributes
+   and methods (minimal interface)
+
+   Copyright (C) 1993,1994,1995,1996,1997,1998 Peter Katzmann p.katzmann@thiesen.com 
+   Copyright (C) 2000 - 2011 Glunz (fill support,  improved color handling)
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
+
+#include "drvbase.h"
+
+   class drvTA10 : public drvbase {
+   
+protected:
+	// = PROTECTED DATA
+
+   public:
+   
+	derivedConstructor(drvTA10);
+ 
+   ~drvTA10(); // Destructor
+	class DriverOptions : public ProgramOptions {
+	public:
+		OptionT < bool, BoolTrueExtractor > pencolorsfromfile ;
+		OptionT < int,  IntValueExtractor > maxPenColors; 
+		OptionT < RSString, RSStringValueExtractor> fillinstruction;
+	//	OptionT < bool, BoolTrueExtractor > useRGBcolors ;
+		OptionT < bool, BoolTrueExtractor > rot90 ;
+		OptionT < bool, BoolTrueExtractor > rot180 ;
+		OptionT < bool, BoolTrueExtractor > rot270 ;
+
+			// penColors(0), maxPenColors(0)
+		DriverOptions():
+			pencolorsfromfile(true,"-pencolorsfromfile",0, 0, "read pen colors from file drvta10.pencolors in pstoedit data directory", 0,false),
+			maxPenColors(true,"-pencolors", "number", 0, "maximum number of pen colors to be used by pstoedit (default 0) - " ,0,0),
+			fillinstruction(true,"-filltype", "string", 0, "select fill type e.g. FT 1" ,0,(const char*)"FT1"),
+                        rot90 (true,"-rot90" ,0, 0, "rotate hpgl by 90 degrees",0,false),
+			rot180(true,"-rot180",0, 0, "rotate hpgl by 180 degrees",0,false),
+			rot270(true,"-rot270",0, 0, "rotate hpgl by 270 degrees",0,false)
+		{
+			ADD( pencolorsfromfile );
+			ADD( maxPenColors );
+			ADD( rot90 );
+			ADD( rot180 );
+			ADD( rot270 );
+		}
+	}*options;
+   
+   #include "drvfuncs.h"
+
+      // void show_rectangle(const float llx, const float lly, const float urx, const float ury);
+       void show_text(const TextInfo & textInfo);
+
+   private:
+	   void print_coords();
+	   unsigned int readPenColors(ostream & errstream, const char *filename, bool justcount);
+	   void SelectPen(float R, float G, float B);
+
+	   //  Start DA hpgl color addition
+	   struct TA10Color { float R; float G; float B; unsigned int intColor;};
+       unsigned int prevColor;
+       unsigned int maxPen;
+	   unsigned int currentPen;
+	   TA10Color * penColors;	
+       //  End DA hpgl color addition
+
+	   int rotation;
+
+   public:
+       static void rot(double & x, double & y, int rotation);
+
+	   NOCOPYANDASSIGN(drvTA10)
+   };
+
+#endif 
+ 
